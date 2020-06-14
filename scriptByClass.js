@@ -132,3 +132,5 @@ calculatorDOM.addEventListener('click', (e) => {
 // const str = '74 * 654 - 5896/6541 + 985.5 + 6 * 9'
 
 // console.log(Calc.calculate(str))
+
+module.exports = Calculator
