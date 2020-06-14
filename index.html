@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Calc</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div id="calculator" class="calculator">
+      <!-- <div id="subViewer" class="viewer">0</div> -->
+      <div id="viewer" class="viewer">0</div>
+
+      <button class="num" data-data="7" data-action="number">7</button>
+      <button class="num" data-data="8" data-action="number">8</button>
+      <button class="num" data-data="9" data-action="number">9</button>
+
+      <button class="ops" data-data="/" data-action="operator">/</button>
+      <button class="num" data-data="4" data-action="number">4</button>
+      <button class="num" data-data="5" data-action="number">5</button>
+      <button class="num" data-data="6" data-action="number" data-action="">6</button>
+      <button class="ops" data-data="+" data-action="operator">+</button>
+
+      <button class="num" data-data="1" data-action="number">1</button>
+      <button class="num" data-data="2" data-action="number">2</button>
+      <button class="num" data-data="3" data-action="number">3</button>
+      <button class="ops" data-data="-" data-action="operator">-</button>
+
+      <button class="num" data-data="0" data-action="number" id="num_0">0</button>
+      <button class="num dot" data-data="." data-action="dot">.</button>
+      <button class="ops multiple" data-data="*" data-action="operator">*</button>
+      <button class="equals ops" data-data="=" data-action="equals" id="equals">=</button>
+      <button class="ops" data-data="del" data-action="delete" id="del">DEL</button>
+      <button class="clear ops" data-data="clear" data-action="clear" id="clear">C</button>
+    </div>
+    <!-- <script src="script.js"></script> -->
+    <script src="scriptByClass.js"></script>
+  </body>
+</html>
