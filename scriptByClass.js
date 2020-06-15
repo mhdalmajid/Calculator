@@ -8,31 +8,25 @@ class Calculator {
       number: /[0-9]/,
       operator: /[/*+-]/,
       dot: /./,
-      operatorAllowedAtStart: /[-+]/,
+      allowedAtStart: /[-+0-9.]/,
     }
     this.dot = '.'
     this.screen = MainScreen
     this.items = []
-    this.isOperatorAtTheEnd = false
-    this.isFirstIsResult = false
+    this.equalPressed = false
   }
 
-  filterInput(str, dataType) {
-    if (dataType === 'number') return this.pattern.number.test(str)
-    if (dataType === 'operator') return this.pattern.operator.test(str)
-    if (dataType === 'dot') return this.pattern.dot.test(str)
-  }
-
-  payload(action, data) {
+  payload(action, str) {
+    if (this.getLength() === 0) if (!this.pattern.allowedAtStart.test(str)) return
     switch (action) {
       case 'number':
-        this.number(data)
+        this.number(str)
         break
       case 'operator':
-        this.operator(data)
+        this.operator(str)
         break
       case 'dot':
-        this.dotted(data)
+        this.dotted()
         break
       case 'delete':
         this.delete()
@@ -49,58 +43,68 @@ class Calculator {
     this.update()
   }
 
+  getLength() {
+    return this.items.length
+  }
+
+  getlastIndex() {
+    return this.getLength() - 1
+  }
+
+  getlastItem() {
+    return this.items[this.getlastIndex()]
+  }
+
+  addItem(str) {
+    this.items.push(str)
+  }
+
+  isOperatorAtTheEnd() {
+    return this.pattern.operator.test(this.getlastItem())
+  }
+
+  concateLastItemWith(str) {
+    this.items[this.getlastIndex()] += str.toString()
+  }
+
   number(str) {
-    if (!this.filterInput(str, 'number')) return
-    if (this.isFirstIsResult && !this.isOperatorAtTheEnd) {
-      this.isFirstIsResult = false
-      this.items = []
-    }
-    if (this.isOperatorAtTheEnd || this.items.length === 0) this.items.push(str.toString())
-    else this.items[this.items.length - 1] += str.toString()
-    this.isOperatorAtTheEnd = false
+    if (!this.pattern.number.test(str)) return
+    if (this.isOperatorAtTheEnd() || this.getLength() === 0) this.addItem(str.toString())
+    else this.concateLastItemWith(str)
   }
 
   operator(str) {
-    const { length } = this.items
-    if (!this.filterInput(str, 'operator') || this.isOperatorAtTheEnd) return
-    if (length === 0 && !this.pattern.operatorAllowedAtStart.test(str)) return
-    if (this.items[length - 1] !== undefined && this.items[length - 1].slice(-1) === this.dot)
+    if (
+      !this.pattern.operator.test(str) ||
+      this.isOperatorAtTheEnd() ||
+      (this.getlastItem() && this.getlastItem().slice(-1) === this.dot)
+    )
       return
-    this.items.push(str)
-    this.isOperatorAtTheEnd = true
-    this.isFirstIsResult = false
+
+    this.addItem(str)
   }
 
   dotted() {
-    if (this.isOperatorAtTheEnd || this.items.length === 0) return this.items.push(`0${this.dot}`)
-    if (!this.items[this.items.length - 1].toString().includes(this.dot))
-      this.items[this.items.length - 1] += this.dot.toString()
-    this.isOperatorAtTheEnd = false
+    if (this.isOperatorAtTheEnd() || this.getLength() === 0) this.addItem(`0${this.dot}`)
+    else if (!this.getlastItem().toString().includes(this.dot)) this.concateLastItemWith(this.dot)
   }
 
   delete() {
-    if (this.items.length === 0) return
-    const lastIndex = this.items.length - 1
-    if (this.items[lastIndex].length <= 1) this.items.pop()
-    else this.items[lastIndex] = this.items[lastIndex].toString().slice(0, -1)
-
-    if (this.pattern.operator.test(this.items[lastIndex])) this.isOperatorAtTheEnd = true
-    else this.isOperatorAtTheEnd = false
+    if (this.getLength() === 0) return
+    if (this.getlastItem().length === 1) this.items.pop()
+    else this.items[this.getlastIndex()] = this.getlastItem().toString().slice(0, -1)
   }
 
   clear() {
     this.items = []
-    this.isFirstIsResult = false
-    this.isOperatorAtTheEnd = false
   }
 
   equal() {
-    if (this.items.length < 3 || this.isOperatorAtTheEnd) return
+    this.equalPressed = true
+    if (this.getLength() < 3 || this.isOperatorAtTheEnd()) return
     const computingResult = this.compute()
     this.items = []
-    this.items.push(computingResult)
-    this.isFirstIsResult = true
-    this.isOperatorAtTheEnd = false
+    this.addItem(computingResult)
   }
 
   compute() {
@@ -109,15 +113,22 @@ class Calculator {
   }
 
   update() {
-    if (this.items.length === 0) this.screen.innerText = 0
-    else this.screen.innerText = this.items.join('')
-  }
+    console.log(this.items)
 
+    if (this.getLength() >= 1) this.screen.innerText = this.items.join('')
+    else this.screen.innerText = 0
+    if (this.equalPressed) {
+      this.items = []
+      this.equalPressed = false
+    }
+  }
+  /*
   calculate(str) {
     this.items = str.split(/([/*+-])/g)
     this.items = this.items.map((item) => item.trim())
     return parseFloat(this.compute())
   }
+  */
 }
 
 const Calc = new Calculator(viewer)
@@ -128,9 +139,5 @@ calculatorDOM.addEventListener('click', (e) => {
 
   if (e.target.matches('button')) Calc.payload(action, data)
 })
-
-// const str = '74 * 654 - 5896/6541 + 985.5 + 6 * 9'
-
-// console.log(Calc.calculate(str))
 
 module.exports = Calculator

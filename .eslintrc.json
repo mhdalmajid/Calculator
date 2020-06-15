@@ -16,15 +16,15 @@
   },
   "plugins": ["html"],
   "rules": {
-    // "no-unused-vars": [
-    //   0,
-    //   {
-    //     "args": "after-used",
-    //     "varsIgnorePattern": "^_",
-    //     "argsIgnorePattern": "^_",
-    //     "pattern": "^_"
-    //   }
-    // ],
+    "no-unused-vars": [
+      0,
+      {
+        "args": "after-used",
+        "varsIgnorePattern": "^_",
+        "argsIgnorePattern": "^_",
+        "pattern": "^_"
+      }
+    ],
     "class-methods-use-this": "off",
     "consistent-return": "off",
     "import/no-extraneous-dependencies": "off",
