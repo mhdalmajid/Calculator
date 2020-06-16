@@ -45,8 +45,8 @@ global.btn = (num) => document.querySelector(`[data-data="${num}"]`)
 
 global.plus = document.querySelector('[data-data="+"]')
 global.minus = document.querySelector('[data-data="-"]')
-global.multiplyBtn = document.querySelector('[data-data="*"]')
-global.divideBtn = document.querySelector('[data-data="/"]')
+global.multiply = document.querySelector('[data-data="*"]')
+global.divide = document.querySelector('[data-data="/"]')
 
 global.dotBtn = document.querySelector('[data-data="."]')
 global.deleteBtn = document.querySelector('[data-data="del"]')
@@ -75,56 +75,5 @@ describe('Plus', () => {
     equalBtn.click()
 
     expect(document.getElementById('viewer').innerText).toBe('13.5')
-  })
-})
-
-describe('Plus', () => {
-  it('shows “0” in viewer after clicking on “-1 - 1 =”', () => {
-    minus.click()
-    btn(1).click()
-    minus.click()
-    btn(1).click()
-    equalBtn.click()
-
-    expect(document.getElementById('viewer').innerText).toBe('-2')
-  })
-
-  it('shows “0” in viewer after clicking on “-1 + 1 =”', () => {
-    minus.click()
-    btn(1).click()
-    minus.click()
-    btn(1).click()
-    equalBtn.click()
-
-    expect(document.getElementById('viewer').innerText).toBe('0')
-  })
-
-  it('shows “0” in viewer after clicking on “0.9 - 1 - 1.1 =”', () => {
-    btn(0).click()
-    dotBtn.click()
-    btn(9).click()
-    minus.click()
-    btn(1).click()
-    minus.click()
-    btn(1).click()
-    btn(1).click()
-    equalBtn.click()
-
-    expect(document.getElementById('viewer').innerText).toBe('-1.2000000000000002')
-  })
-
-  it('shows “0” in viewer after clicking on “0.9 - 1 - 1.1 =”', () => {
-    btn(0).click()
-    dotBtn.click()
-    btn(9).click()
-    minus.click()
-    btn(1).click()
-    minus.click()
-    btn(1).click()
-    dotBtn.click()
-    btn(1).click()
-    equalBtn.click()
-
-    expect(document.getElementById('viewer').innerText).toBe('-1.2000000000000002')
   })
 })

@@ -1,14 +1,42 @@
+/* eslint-disable max-classes-per-file */
 /* eslint-disable no-eval */
 const viewer = document.getElementById('viewer')
 const calculatorDOM = document.getElementById('calculator')
+class Operators {
+  constructor() {
+    this.runOperator = {
+      '+': this.plus,
+      '-': this.minus,
+      '/': this.divide,
+      '*': this.multiply,
+    }
+  }
 
-class Calculator {
+  plus(num1, num2) {
+    return num1 + num2
+  }
+
+  minus(num1, num2) {
+    return num1 - num2
+  }
+
+  divide(num1, num2) {
+    return num1 / num2
+  }
+
+  multiply(num1, num2) {
+    return num1 * num2
+  }
+}
+class Calculator extends Operators {
   constructor(MainScreen) {
+    super()
     this.pattern = {
       number: /[0-9]/,
       operator: /[/*+-]/,
       dot: /./,
       allowedAtStart: /[-+0-9.]/,
+      operatorAllowedAtStart: /[-+]/,
     }
     this.dot = '.'
     this.screen = MainScreen
@@ -69,6 +97,10 @@ class Calculator {
 
   number(str) {
     if (!this.pattern.number.test(str)) return
+    if (this.equalPressed) {
+      this.items = []
+      this.equalPressed = false
+    }
     if (this.isOperatorAtTheEnd() || this.getLength() === 0) this.addItem(str.toString())
     else this.concateLastItemWith(str)
   }
@@ -80,11 +112,15 @@ class Calculator {
       (this.getlastItem() && this.getlastItem().slice(-1) === this.dot)
     )
       return
-
     this.addItem(str)
+    this.equalPressed = false
   }
 
   dotted() {
+    if (this.equalPressed) {
+      this.items = []
+      this.equalPressed = false
+    }
     if (this.isOperatorAtTheEnd() || this.getLength() === 0) this.addItem(`0${this.dot}`)
     else if (!this.getlastItem().toString().includes(this.dot)) this.concateLastItemWith(this.dot)
   }
@@ -93,10 +129,12 @@ class Calculator {
     if (this.getLength() === 0) return
     if (this.getlastItem().length === 1) this.items.pop()
     else this.items[this.getlastIndex()] = this.getlastItem().toString().slice(0, -1)
+    this.equalPressed = false
   }
 
   clear() {
     this.items = []
+    this.equalPressed = false
   }
 
   equal() {
@@ -104,31 +142,70 @@ class Calculator {
     if (this.getLength() < 3 || this.isOperatorAtTheEnd()) return
     const computingResult = this.compute()
     this.items = []
-    this.addItem(computingResult)
+    if (computingResult[0] !== '-') return this.addItem(computingResult)
+    this.addItem('-')
+    this.addItem(computingResult.slice(1))
+  }
+
+  arrayOfnubmersAndOperators(array) {
+    let arr = array
+    if (this.pattern.operatorAllowedAtStart.test(arr[0])) {
+      const combined = parseFloat(arr[0] + arr[1])
+      arr = [combined, ...arr.slice(2)]
+    }
+    const newArray = arr.map((item) => parseFloat(item) || item)
+    return newArray
+  }
+
+  computeByPriority(array) {
+    let items = array
+    let prev
+    let next
+    let temp
+    while (items.length !== 1) {
+      const indexOfMultiple = items.indexOf('*')
+      const indexOfDivide = items.indexOf('/')
+      if (items.length < 4) {
+        return this.calculateIfthreeItems(items)
+      }
+      if (items.includes('*')) {
+        prev = items.slice(indexOfMultiple - 1, indexOfMultiple)
+        next = items.slice(indexOfMultiple + 1, indexOfMultiple + 2)
+        temp = this.runOperator['*'](prev, next)
+        items.splice(indexOfMultiple - 1, 3, temp)
+      } else if (items.includes('/')) {
+        prev = items.slice(indexOfDivide - 1, indexOfDivide)
+        next = items.slice(indexOfDivide + 1, indexOfDivide + 2)
+        temp = this.runOperator['/'](prev, next)
+        items.splice(indexOfDivide - 1, 3, temp)
+      } else {
+        items = [this.runOperator[items[1]](items[0], items[2]), ...items.slice(3)]
+      }
+    }
+    return items
+  }
+
+  calculateIfthreeItems(array) {
+    return [this.runOperator[array[1]](array[0], array[2])]
   }
 
   compute() {
-    const arrayToString = this.items.join('')
-    return eval(arrayToString).toString()
+    let items = this.arrayOfnubmersAndOperators(this.items)
+    let prev
+    let next
+    let temp
+    if (items.length < 4) {
+      return this.calculateIfthreeItems(items)
+    }
+    items = this.computeByPriority(items)
+
+    return items
   }
 
   update() {
-    console.log(this.items)
-
     if (this.getLength() >= 1) this.screen.innerText = this.items.join('')
     else this.screen.innerText = 0
-    if (this.equalPressed) {
-      this.items = []
-      this.equalPressed = false
-    }
   }
-  /*
-  calculate(str) {
-    this.items = str.split(/([/*+-])/g)
-    this.items = this.items.map((item) => item.trim())
-    return parseFloat(this.compute())
-  }
-  */
 }
 
 const Calc = new Calculator(viewer)
